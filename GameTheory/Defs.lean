@@ -1,4 +1,5 @@
-import «GameTheory».Utils
+import Mathlib.Tactic
+import GameTheory.Utils
 open Std
 
 -- Size of pile (number of tokens) -> Number of piles of that size
@@ -47,8 +48,7 @@ def is_won (g: Game) := game_equal g HashMap.empty
 
 -- It will terminate because the option is always 'smaller' than the game
 partial def winning_game (g: Game) :=
-  if is_won g then False
-  else ∃g', is_option g g' ∧ (is_won g' ∨ ∃g'', is_option g' g'' ∧ winning_game g'')
+  ¬is_won g ∧ ∃g', is_option g g' ∧ (is_won g' ∨ ∃g'', is_option g' g'' ∧ winning_game g'')
 
 def temp: Game :=
   let m := HashMap.empty
@@ -73,6 +73,28 @@ where
     have m := _sum t
     let m := m.insert h (g1[h]?.getD 0 + g2[h]?.getD 0)
     m
+
+-- -- Check if a move is valid
+-- def valid_move (g: Game) (m: Nat × Nat) : Bool :=
+--   -- m: Nat x Nat := (pile to take from, tokens to take)
+--   (g[m.fst]?.getD 0) > 0 ∧ m.snd ≤ m.fst
+
+-- -- Assumes move is valid
+-- def apply_move (g: Game) (m: Nat × Nat) : Game :=
+--   have (old, new) := (m.fst, m.fst - m.snd)
+--   have g := g.insert old (Nat.pred g[old]?.get!)
+--   have g := g.insert new (Nat.succ (g[new]?.getD 0))
+--   g
+
+-- def is_option (g1 g2: Game) :=
+--   ∃m, valid_move g1 m ∧ game_equal g1 (apply_move g2 m)
+
+-- mutual
+-- unsafe def winning_game (g: Game) :=
+--   ∃op, is_option g op → losing_game op
+-- unsafe def losing_game (g: Game) :=
+--   ∀op, is_option g op → winning_game op
+-- end
 
 -- Ignore below, temporary stuff for debugging
 def temp1: Game :=
